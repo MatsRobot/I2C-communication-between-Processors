@@ -3,57 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="https://matsrobot.github.io/I2C-communication-between-Processors/Favicon-192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="https://matsrobot.github.io/I2C-Bridge/Favicon-192.png" sizes="192x192">
     
-    <title>I2C Multi-Processor Communication | MatsRobot</title>
-    <meta name="description" content="Technical implementation of I2C Master-Slave communication between Raspberry Pi Pico and Arduino, including addressing and multi-device bus management.">
+    <title>I2C-Bridge: Multi-Processor Data Exchange | MatsRobot</title>
+    <meta name="description" content="Hardware link between Raspberry Pi Pico and Arduino using I2C for modular data exchange.">
     
+    <link rel="canonical" href="https://github.com/MatsRobot/I2C-Bridge" />
+
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; color: #24292e; max-width: 800px; margin: 0 auto; padding: 2rem; }
-        h1, h2, h3 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-        .btn { background-color: #2ea44f; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; margin-top: 20px; }
-        img { max-width: 100%; height: auto; border-radius: 6px; margin: 1rem 0; border: 1px solid #ddd; }
-        .note { background-color: #fffbdd; padding: 1rem; border-left: 4px solid #d4a017; margin: 1rem 0; }
-        code { background-color: #f6f8fa; padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
-        .flex-images { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .flex-images img { max-width: 48%; }
+        :root {
+            --gh-green: #2ea44f;
+            --gh-dark: #24292e;
+            --gh-blue: #0366d6;
+            --gh-border: #eaecef;
+            --gh-bg-gray: #f6f8fa;
+            --note-bg: #fffbdd;
+            --note-border: #d4a017;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; 
+            line-height: 1.6; 
+            color: var(--gh-dark); 
+            max-width: 950px; 
+            margin: 0 auto; 
+            padding: 2rem; 
+        }
+
+        .hero-section {
+            display: flex;
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero-text { flex: 3; }
+
+        .image-sidebar { 
+            flex: 2; 
+            border: 1px solid var(--gh-border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .image-sidebar img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .caption { 
+            font-size: 0.85rem; 
+            color: #586069; 
+            margin-top: 10px; 
+            display: block; 
+        }
+
+        h1 { font-size: 1.8rem; margin-top: 0; }
+        h2 { color: var(--gh-blue); border-bottom: 1px solid var(--gh-border); padding-bottom: 0.3em; margin-top: 2rem; }
+        h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+
+        .note { 
+            background-color: var(--note-bg); 
+            padding: 1.25rem; 
+            border-left: 5px solid var(--note-border); 
+            margin: 1.5rem 0; 
+            border-radius: 4px;
+        }
+
+        .btn { 
+            background-color: var(--gh-green); 
+            color: white; 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 6px; 
+            display: inline-block; 
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #2c974b; }
+
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .tech-table th { 
+            background-color: var(--gh-bg-gray); 
+            text-align: left; 
+            padding: 12px; 
+            border: 1px solid var(--gh-border);
+        }
+
+        .tech-table td { 
+            padding: 12px; 
+            border: 1px solid var(--gh-border); 
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 2rem; 
+            margin-top: 1.5rem; 
+        }
+
+        code { background-color: var(--gh-bg-gray); padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
+
+        footer { 
+            margin-top: 4rem; 
+            padding: 2rem 0;
+            border-top: 1px solid var(--gh-border); 
+            text-align: center; 
+            color: #6a737d; 
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section, .grid { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
 
-    <h1>I2C Communication Between Processors</h1>
-    
-    <p>This project explores reliable I2C data transfer in readable text format between different microcontrollers. The primary focus is establishing a <strong>Pico as Master</strong> and an <strong>Arduino as Slave</strong>, while navigating the limitations of MicroPython's I2C Slave libraries.</p>
+    <div class="hero-section">
+        <div class="hero-text">
+            <h1>🖧 I2C-Bridge: Multi-Processor Data Exchange</h1>
+            <p>A specialized hardware-to-hardware link bridging the Raspberry Pi Pico (Master) and Arduino (Slave). This physical data bridge allows for modular scaling by offloading sensor polling and ultrasonic distance tracking to a dedicated secondary processor.</p>
+            <div class="note">
+                <strong>Physical Link Integrity:</strong> By establishing a common ground and a master-driven clock (SCL), this system ensures reliable data transfer across the physical wire-link, bypassing the typical software lag of high-level protocols.
+            </div>
 
-    <div class="note">
-        <strong>The Technical Challenge:</strong> While I2C theoretically supports multiple masters, synchronizing clocks (SCL) is a major hurdle. Furthermore, using a Pico as a slave in MicroPython is difficult due to limited library support for assigning slave addresses.
+            <a href="https://github.com/MatsRobot/I2C-Bridge" class="btn">
+                Get Full Build Instructions and Project downloads on GitHub
+            </a>
+        </div>
+
+        <div class="image-sidebar">
+            <img src="https://github.com/user-attachments/assets/1b0e9583-226e-419a-a9e9-cb47b47ef424" alt="I2C Hardware Link Setup">
+            <span class="caption">Wired Link & Level-Shifter Logic Architecture</span>
+        </div>
     </div>
 
-    <img src="https://github.com/user-attachments/assets/1b0e9583-226e-419a-a9e9-cb47b47ef424" alt="I2C Master-Slave Hardware Setup">
-
-    <h2>Pico (Master) to Arduino (Slave) Setup</h2>
-    <p>In this working model, a <strong>Raspberry Pi Pico</strong> acting as Master uses I2C0 (Pins GP16/GP17) to communicate with an <strong>Arduino</strong> and an <strong>OLED Display</strong> on the same bus.</p>
-    
+    <h2>How It Works: The Hardware Interconnect</h2>
+        <p>This implementation treats the I2C bus as a dedicated physical link between disparate architectures (ARM Cortex-M0+ and ATmega328P):</p>
     <ul>
-        <li><strong>Arduino Slave Address:</strong> <code>10</code> (0x0A Hex)</li>
-        <li><strong>OLED Address:</strong> <code>60</code> (0x3C Hex)</li>
-        <li><strong>Sensor:</strong> MaxSonar Ultrasound transducer connected to Arduino.</li>
+        <li><strong>Physical Interconnect:</strong> Uses a 4-wire setup (VCC, GND, SDA, SCL) to create a persistent data pipeline.</li>
+        <li><strong>Bus Isolation:</strong> The RP2040 uses its secondary I2C1 channel to isolate high-bandwidth OLED traffic from the critical sensor-link on I2C0.</li>
+        <li><strong>Level Shifting:</strong> Managing the bidirectional 3.3V ↔ 5.0V interface to ensure logic level safety across the link.</li>
     </ul>
 
-    <div class="flex-images">
-        <img src="https://github.com/user-attachments/assets/e6ec01bc-53f9-495d-a87c-e3d81cdc774c" alt="Circuit Detail 1">
-        <img src="https://github.com/user-attachments/assets/2cf411a6-a8f2-44cc-9e6d-16a48410232f" alt="Circuit Detail 2">
+    <h2>Technical Specifications</h2>
+    <table class="tech-table">
+        <thead>
+            <tr><th>Feature</th><th>Technical Specification</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>Master Link</strong></td><td>Raspberry Pi Pico (MicroPython)</td></tr>
+            <tr><td><strong>Slave Link</strong></td><td>Arduino Nano/Uno (C++ / Wire.h)</td></tr>
+            <tr><td><strong>Address Protocol</strong></td><td>0x0A (Slave Node) / 0x3C (Display)</td></tr>
+            <tr><td><strong>Primary Input</strong></td><td>MaxSonar Ultrasonic Telemetry</td></tr>
+            <tr><td><strong>Clock Rate</strong></td><td>Standard 100kHz (Optimized for Distance Wires)</td></tr>
+        </tbody>
+    </table>
+
+    <div class="grid">
+        <div>
+            <h3>Hardware Interrupts</h3>
+            <p>The link uses hardware-level <code>onRequest</code> interrupts on the Arduino side, meaning data is served immediately without the Master needing to wait for a sensor-poll loop.</p>
+        </div>
+        <div>
+            <h3>Modular Scaling</h3>
+            <p>This "Bridge" design allows additional Arduino "Link-Nodes" to be added to the same SDA/SCL lines by simply assigning unique hex addresses.</p>
+        </div>
     </div>
 
-    <h2>Handling Bus Conflicts</h2>
-    <p>A key finding in this project was the management of the data bus. While the Pico can write to the OLED, the Arduino (as slave) cannot communicate with the OLED on the same bus without creating interrupt conflicts. The documentation within the code details how to disable specific initiations to maintain bus stability.</p>
-
-    <a href="https://github.com/MatsRobot/I2C-communication-between-Processors" class="btn">View Source Code on GitHub</a>
-
-    <hr>
     <footer>
-        <p><small>&copy; MatsRobot - Documenting Robotics & IoT Solutions</small></p>
-        <p><a href="https://matsrobot.github.io/" style="text-decoration: none; color: #0366d6;">← Back to Home</a></p>
+        <p>© 2026 MatsRobot - Part of the Open Source Robotics Initiative</p>
+        <p><small>Optimized for Google Search & GitHub Pages Integration</small></p>
     </footer>
 
 </body>
