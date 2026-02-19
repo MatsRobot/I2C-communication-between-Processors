@@ -1,4 +1,4 @@
-# 📂 I2C-Bridge: Multi-Processor Data Exchange
+# 🔗 I2C-Bridge: Multi-Processor Data Exchange
 
 A comprehensive implementation of I2C communication between a Raspberry Pi Pico (Master) and an Arduino (Slave), including multi-bus OLED integration and data handling.
 
