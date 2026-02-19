@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="https://matsrobot.github.io/I2C-communication-between-Processors/Favicon-192.png" sizes="192x192">
     
     <title>I2C-Bridge: Multi-Processor Data Exchange | MatsRobot</title>
-    <meta name="description" content="Hardware link between Raspberry Pi Pico and Arduino using I2C for modular data exchange.">
+    <meta name="description" content="Cross-platform I2C communication between Raspberry Pi Pico (Master) and Arduino (Slave) with dual-bus OLED integration.">
     
     <link rel="canonical" href="https://github.com/MatsRobot/I2C-communication-between-Processors" />
 
@@ -130,29 +130,30 @@
 
     <div class="hero-section">
         <div class="hero-text">
-            <h1>🖧 I2C-Bridge: Multi-Processor Data Exchange</h1>
-            <p>A specialized hardware-to-hardware link bridging the Raspberry Pi Pico (Master) and Arduino (Slave). This physical data bridge allows for modular scaling by offloading sensor polling and ultrasonic distance tracking to a dedicated secondary processor.</p>
+            <h1>🔗 I2C-Bridge: Multi-Processor Data Exchange</h1>
+            <p>A high-reliability communication framework bridging the Raspberry Pi Pico (Master) and Arduino (Slave). It features a robust dual-bus architecture to isolate sensor telemetry from display traffic, optimized for real-time robotic feedback loops.</p>
             <div class="note">
-                <strong>Physical Link Integrity:</strong> By establishing a common ground and a master-driven clock (SCL), this system ensures reliable data transfer across the physical wire-link, bypassing the typical software lag of high-level protocols.
+                <strong>Arbitration Fix:</strong> While I2C theoretically supports "Multi-Master," this project enforces a strict Master-Slave relationship via central clock management on the Pico, eliminating SCL synchronization errors.
             </div>
 
-            <a href="https://github.com/MatsRobot/I2C-Bridge" class="btn">
-                Get Full Build Instructions and Project downloads on GitHub
+            <a href="https://github.com/MatsRobot/I2C-communication-between-Processors" class="btn">
+                Download Build Instructions and Full Project Assets on GitHub
             </a>
         </div>
 
         <div class="image-sidebar">
-            <img src="https://github.com/user-attachments/assets/1b0e9583-226e-419a-a9e9-cb47b47ef424" alt="I2C Hardware Link Setup">
-            <span class="caption">Wired Link & Level-Shifter Logic Architecture</span>
+            <img src="https://github.com/user-attachments/assets/1b0e9583-226e-419a-a9e9-cb47b47ef424" alt="I2C Hardware Setup">
+            <span class="caption">Dual-Controller Hardware Architecture</span>
         </div>
     </div>
 
-    <h2>How It Works: The Hardware Interconnect</h2>
-        <p>This implementation treats the I2C bus as a dedicated physical link between disparate architectures (ARM Cortex-M0+ and ATmega328P):</p>
+    <h2>How It Works: Dual-Bus Isolation Logic</h2>
+    
+    <p>This implementation utilizes the dual I2C controllers on the RP2040 to prevent data collisions and bus lag:</p>
     <ul>
-        <li><strong>Physical Interconnect:</strong> Uses a 4-wire setup (VCC, GND, SDA, SCL) to create a persistent data pipeline.</li>
-        <li><strong>Bus Isolation:</strong> The RP2040 uses its secondary I2C1 channel to isolate high-bandwidth OLED traffic from the critical sensor-link on I2C0.</li>
-        <li><strong>Level Shifting:</strong> Managing the bidirectional 3.3V ↔ 5.0V interface to ensure logic level safety across the link.</li>
+        <li><strong>I2C0 (GP16/GP17) - The External Bus:</strong> Connects the Pico to the Arduino Slave (Address <code>0x0A</code>) and a primary 0.96" OLED.</li>
+        <li><strong>I2C1 - The Monitoring Bus:</strong> Dedicated to a secondary OLED display for local system status, ensuring visual updates don't interrupt sensor polling.</li>
+        <li><strong>Cross-Platform Bridge:</strong> Handshakes between MicroPython (Pico) and C++ (Arduino) using readable text strings transmitted via <code>onRequest</code> interrupts.</li>
     </ul>
 
     <h2>Technical Specifications</h2>
@@ -161,22 +162,22 @@
             <tr><th>Feature</th><th>Technical Specification</th></tr>
         </thead>
         <tbody>
-            <tr><td><strong>Master Link</strong></td><td>Raspberry Pi Pico (MicroPython)</td></tr>
-            <tr><td><strong>Slave Link</strong></td><td>Arduino Nano/Uno (C++ / Wire.h)</td></tr>
-            <tr><td><strong>Address Protocol</strong></td><td>0x0A (Slave Node) / 0x3C (Display)</td></tr>
-            <tr><td><strong>Primary Input</strong></td><td>MaxSonar Ultrasonic Telemetry</td></tr>
-            <tr><td><strong>Clock Rate</strong></td><td>Standard 100kHz (Optimized for Distance Wires)</td></tr>
+            <tr><td><strong>Master Controller</strong></td><td>Raspberry Pi Pico (MicroPython)</td></tr>
+            <tr><td><strong>Slave Controller</strong></td><td>Arduino Nano/Uno (C++ / Wire.h)</td></tr>
+            <tr><td><strong>Primary Address</strong></td><td>0x0A (Slave) / 0x3C (OLED)</td></tr>
+            <tr><td><strong>Sensor Node</strong></td><td>MaxSonar Ultrasound Transducer</td></tr>
+            <tr><td><strong>Logic Levels</strong></td><td>3.3V (Pico) ↔ 5.0V (Arduino)</td></tr>
         </tbody>
     </table>
 
     <div class="grid">
         <div>
-            <h3>Hardware Interrupts</h3>
-            <p>The link uses hardware-level <code>onRequest</code> interrupts on the Arduino side, meaning data is served immediately without the Master needing to wait for a sensor-poll loop.</p>
+            <h3>Interrupt Safety</h3>
+            <p>A critical architectural discovery: The Arduino cannot manage a local OLED while in Slave mode on the same bus without causing interrupt conflicts. All display tasks are delegated to the Pico Master.</p>
         </div>
         <div>
-            <h3>Modular Scaling</h3>
-            <p>This "Bridge" design allows additional Arduino "Link-Nodes" to be added to the same SDA/SCL lines by simply assigning unique hex addresses.</p>
+            <h3>Asynchronous Telemetry</h3>
+            <p>The Arduino polls distance data locally and serves it instantly when the Pico triggers an I2C request, ensuring the Master never waits for a slow sensor reading.</p>
         </div>
     </div>
 
@@ -186,5 +187,4 @@
     </footer>
 
 </body>
-
 </html>
