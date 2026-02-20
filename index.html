@@ -12,13 +12,15 @@
 
     <style>
         :root {
-            --gh-green: #2ea44f;
+            --gh-green: #238636; /* Darker GitHub Green */
+            --gh-green-hover: #2ea44f;
             --gh-dark: #24292e;
             --gh-blue: #0366d6;
             --gh-border: #eaecef;
             --gh-bg-gray: #f6f8fa;
             --note-bg: #fffbdd;
             --note-border: #d4a017;
+            --code-bg: #f1f8ff;
         }
 
         body { 
@@ -73,17 +75,61 @@
             border-radius: 4px;
         }
 
-        .btn { 
+        /* --- STYLED DOWNLOAD BUTTON --- */
+        .btn-download { 
             background-color: var(--gh-green); 
             color: white; 
-            padding: 12px 24px; 
+            padding: 12px 28px; 
             text-decoration: none; 
             border-radius: 6px; 
-            display: inline-block; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 18px; 
             font-weight: 600;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
+            border: 1px solid rgba(27, 31, 35, 0.15);
+            box-shadow: 0 1px 0 rgba(27, 31, 35, 0.1);
         }
-        .btn:hover { background-color: #2c974b; }
+
+        .btn-download:hover { 
+            background-color: var(--gh-green-hover); 
+        }
+
+        .btn-download:active {
+            transform: translateY(1px);
+        }
+
+        .btn-text-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            line-height: 1.1;
+            text-align: center;
+        }
+
+        .btn-main {
+            font-size: 1.35rem;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .btn-sub-lines {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 400;
+            opacity: 0.95;
+            letter-spacing: 0.2px;
+        }
+
+        .download-icon {
+            fill: currentColor;
+            flex-shrink: 0;
+        }
 
         .tech-table {
             width: 100%;
@@ -123,6 +169,7 @@
 
         @media (max-width: 768px) {
             .hero-section, .grid { flex-direction: column; }
+            .btn-download { width: 100%; justify-content: center; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -136,8 +183,17 @@
                 <strong>Arbitration Fix:</strong> While I2C theoretically supports "Multi-Master," this project enforces a strict Master-Slave relationship via central clock management on the Pico, eliminating SCL synchronization errors.
             </div>
 
-            <a href="https://github.com/MatsRobot/I2C-communication-between-Processors" class="btn">
-                Download Build Instructions and Full Project Assets on GitHub
+            <a href="https://github.com/MatsRobot/I2C-communication-between-Processors" class="btn-download">
+                <svg class="download-icon" width="32" height="32" viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                <div class="btn-text-container">
+                    <span class="btn-main">Downloads</span>
+                    <div class="btn-sub-lines">
+                        <span>Build Instructions and Full Project</span>
+                        <span>Source-Code on GitHub</span>
+                    </div>
+                </div>
             </a>
         </div>
 
