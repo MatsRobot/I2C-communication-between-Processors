@@ -68,3 +68,5 @@ A critical discovery during development was that the Arduino could not safely co
 Detailed code for both the MicroPython Master and the Arduino C++ Slave can be found in the repository. Please ensure common ground is established between the Pico and Arduino to prevent data corruption.
 
 ---
+
+<small>© 2026 MatsRobot | Licensed under the [MIT License](https://github.com/MatsRobot/matsrobot.github.io/blob/main/LICENSE)</small>
